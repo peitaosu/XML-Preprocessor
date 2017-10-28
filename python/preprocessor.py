@@ -13,6 +13,15 @@ class Preprocessor():
             return -1
 
     def preprocess(self):
+        for index, str in enumerate(self.original_file["content"]):
+            print index, str
+            #TODO: Include Files <?include?>
+            #TODO: Environment Variables $(env.EnvVar)
+            #TODO: System Variables $(sys.SysVar)
+            #TODO: Custom Variables $(var.CusVar)
+            #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
+            #TODO: Errors and Warnings <?error?>, <?warning?>
+            #TODO: Iteration Statements <?foreach?>
         self.processed_file["content"] = self.original_file["content"]
 
     def save(self, file_path):
