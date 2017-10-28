@@ -8,6 +8,7 @@ class Preprocessor():
         self.original_file = {}
         self.processed_file = {}
         self.sys_vars = self.init_sys_vars()
+        self.cus_vars = {}
 
     def load(self, file_path):
         self.original_file["file"] = file_path
@@ -52,13 +53,29 @@ class Preprocessor():
             xml_str = xml_str.replace(group_sys, self.sys_vars[group_var])
         return xml_str
 
+    def parse_cus_var(self, xml_str):
+        define_regex = r"(<\?define([\w\s]+)=([\w\s\"]+)\?>)"
+        matches = re.findall(define_regex, xml_str)
+        for group_def, group_name, group_var in matches:
+            group_name = group_name.strip()
+            group_var = group_var.strip().strip("\"")
+            self.cus_vars[group_name] = group_var
+            xml_str = xml_str.replace(group_def, "")
+        cusvar_regex = r"(\$\(var\.(\w+)\))"
+        matches = re.findall(cusvar_regex, xml_str)
+        for group_cus, group_var in matches:
+            if group_var not in self.cus_vars:
+                raise Exception("Wrong Custom Variable: " + group_var)
+            xml_str = xml_str.replace(group_cus, self.cus_vars[group_var])
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
             xml_str = self.parse_include(xml_str)
             xml_str = self.parse_env_var(xml_str)
             xml_str = self.parse_sys_var(xml_str)
-            #TODO: Custom Variables $(var.CusVar)
+            xml_str = self.parse_cus_var(xml_str)
             #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
             #TODO: Errors and Warnings <?error?>, <?warning?>
             #TODO: Iteration Statements <?foreach?>
