@@ -81,6 +81,17 @@ class Preprocessor():
             xml_str = xml_str.replace(group_wrn, "")
         return xml_str
 
+    def parse_if_elseif(self, xml_str):
+        ifelif_regex = r"(<\?(if|elseif)\s*([^\"\s=<>!]+)\s*([!=<>]+)\s*\"*([^\"=<>!]+)\"*\s*\?>)"
+        matches = re.findall(ifelif_regex, xml_str)
+        for group_ifelif, group_tag, group_left, group_operator, group_right in matches:
+            if "<" in group_operator or ">" in group_operator:
+                result = eval(group_left + group_operator + group_right)
+            else:
+                result = eval('"{}" {} "{}"'.format(group_left, group_operator, group_right))
+            xml_str = xml_str.replace(group_ifelif, "<?" + group_tag + " " + str(result) + "?>")
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
@@ -89,6 +100,7 @@ class Preprocessor():
             xml_str = self.parse_sys_var(xml_str)
             xml_str = self.parse_cus_var(xml_str)
             #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
+            xml_str = self.parse_if_elseif(xml_str)
             xml_str = self.parse_error_warning(xml_str)
             #TODO: Iteration Statements <?foreach?>
             self.processed_file["content"].extend(xml_str.split("\n"))
