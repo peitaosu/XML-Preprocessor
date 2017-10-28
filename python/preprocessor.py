@@ -12,6 +12,13 @@ def parse_include(xml_str):
             xml_str = xml_str.replace(group_inc, inc_file_content)
     return xml_str
 
+def parse_env_var(xml_str):
+    envvar_regex = r"(\$\(env\.(\w+)\))"
+    matches = re.findall(envvar_regex, xml_str)
+    for group_env, group_var in matches:
+        xml_str = xml_str.replace(group_env, os.environ[group_var])
+    return xml_str
+
 class Preprocessor():
     def __init__(self):
         self.original_file = {}
@@ -30,7 +37,7 @@ class Preprocessor():
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
             xml_str = parse_include(xml_str)
-            #TODO: Environment Variables $(env.EnvVar)
+            xml_str = parse_env_var(xml_str)
             #TODO: System Variables $(sys.SysVar)
             #TODO: Custom Variables $(var.CusVar)
             #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
