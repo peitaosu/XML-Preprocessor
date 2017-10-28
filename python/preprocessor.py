@@ -69,6 +69,18 @@ class Preprocessor():
             xml_str = xml_str.replace(group_cus, self.cus_vars[group_var])
         return xml_str
 
+    def parse_error_warning(self, xml_str):
+        error_regex = r"(<\?error\s*\"([^\"]+)\"\s*\?>)"
+        matches = re.findall(error_regex, xml_str)
+        for group_err, group_var in matches:
+            raise Exception("[Error]: " + group_var)
+        warning_regex = r"(<\?warning\s*\"([^\"]+)\"\s*\?>)"
+        matches = re.findall(warning_regex, xml_str)
+        for group_wrn, group_var in matches:
+            print "[Warning]: " + group_var
+            xml_str = xml_str.replace(group_wrn, "")
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
@@ -77,7 +89,7 @@ class Preprocessor():
             xml_str = self.parse_sys_var(xml_str)
             xml_str = self.parse_cus_var(xml_str)
             #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
-            #TODO: Errors and Warnings <?error?>, <?warning?>
+            xml_str = self.parse_error_warning(xml_str)
             #TODO: Iteration Statements <?foreach?>
             self.processed_file["content"].extend(xml_str.split("\n"))
 
