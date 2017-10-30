@@ -92,6 +92,17 @@ class Preprocessor():
             xml_str = xml_str.replace(group_ifelif, "<?" + group_tag + " " + str(result) + "?>")
         return xml_str
 
+    def parse_ifdef_ifndef(self, xml_str):
+        ifndef_regex = r"(<\?(ifdef|ifndef)\s*([\w]+)\s*\?>)"
+        matches = re.findall(ifndef_regex, xml_str)
+        for group_ifndef, group_tag, group_var in matches:
+            if group_tag == "ifdef":
+                result = group_var in self.cus_vars
+            else:
+                result = group_var not in self.cus_vars
+            xml_str = xml_str.replace(group_ifndef, "<?if " + str(result) + "?>")
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
@@ -101,6 +112,7 @@ class Preprocessor():
             xml_str = self.parse_cus_var(xml_str)
             #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
             xml_str = self.parse_if_elseif(xml_str)
+            xml_str = self.parse_ifdef_ifndef(xml_str)
             xml_str = self.parse_error_warning(xml_str)
             #TODO: Iteration Statements <?foreach?>
             self.processed_file["content"].extend(xml_str.split("\n"))
