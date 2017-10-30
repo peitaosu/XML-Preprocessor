@@ -54,7 +54,7 @@ class Preprocessor():
         return xml_str
 
     def parse_cus_var(self, xml_str):
-        define_regex = r"(<\?define([\w\s]+)=([\w\s\"]+)\?>)"
+        define_regex = r"(<\?define\s*(\w+)\s*=\s*([\w\s\"]+)\s*\?>)"
         matches = re.findall(define_regex, xml_str)
         for group_def, group_name, group_var in matches:
             group_name = group_name.strip()
