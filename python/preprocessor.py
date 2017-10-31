@@ -114,6 +114,36 @@ class Preprocessor():
             xml_str = xml_str.replace(group_for, group_texts)
         return xml_str
 
+    def parse_if_else_if(self, xml_str):
+        if_elif_else_regex = r"(<\?if\s(True|False)\?>\n(.*)\n<\?elseif\s(True|False)\?>\n(.*)\n<\?else\?>\n(.*)\n<\?endif\?>\n)"
+        if_else_regex = r"(<\?if\s(True|False)\?>\n(.*)\n<\?else\?>\n(.*)\n<\?endif\?>\n)"
+        if_regex = r"(<\?if\s(True|False)\?>\n(.*)\n<\?endif\?>\n)"
+        matches = re.findall(if_elif_else_regex, xml_str)
+        for group_full, group_if, group_if_elif, group_elif, group_elif_else, group_else in matches:
+            result = ""
+            if group_if == "True":
+                result = group_if_elif
+            elif group_elif == "True":
+                result = group_elif_else
+            else:
+                result = group_else
+            xml_str = xml_str.replace(group_full, result)
+        matches = re.findall(if_else_regex, xml_str)
+        for group_full, group_if, group_if_else, group_else in matches:
+            result = ""
+            if group_if == "True":
+                result = group_if_else
+            else:
+                result = group_else
+            xml_str = xml_str.replace(group_full, result)
+        matches = re.findall(if_regex, xml_str)
+        for group_full, group_if, group_text in matches:
+            result = ""
+            if group_if == "True":
+                result = group_text
+            xml_str = xml_str.replace(group_full, result)
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
@@ -121,11 +151,11 @@ class Preprocessor():
             xml_str = self.parse_env_var(xml_str)
             xml_str = self.parse_sys_var(xml_str)
             xml_str = self.parse_cus_var(xml_str)
-            #TODO: Conditional Statements <?if ?>, <?ifdef ?>, <?ifndef ?>, <?else?>, <?elseif ?>, <?endif?>
             xml_str = self.parse_if_elseif(xml_str)
             xml_str = self.parse_ifdef_ifndef(xml_str)
             xml_str = self.parse_error_warning(xml_str)
             xml_str = self.parse_foreach(xml_str)
+            xml_str = self.parse_if_else_if(xml_str)
             self.processed_file["content"].extend(xml_str.split("\n"))
 
     def save(self, file_path):
