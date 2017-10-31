@@ -65,7 +65,7 @@ class Preprocessor():
         matches = re.findall(cusvar_regex, xml_str)
         for group_cus, group_var in matches:
             if group_var not in self.cus_vars:
-                raise Exception("Wrong Custom Variable: " + group_var)
+                continue
             xml_str = xml_str.replace(group_cus, self.cus_vars[group_var])
         return xml_str
 
@@ -103,6 +103,17 @@ class Preprocessor():
             xml_str = xml_str.replace(group_ifndef, "<?if " + str(result) + "?>")
         return xml_str
 
+    def parse_foreach(self, xml_str):
+        foreach_regex = r"((<\?foreach\s+(\w+)\s+in\s+([\w;]+)\s*\?>)((?!<\?endforeach\?>).*)(<\?endforeach\?>))"
+        matches = re.findall(foreach_regex, xml_str)
+        for group_for, group_forvars, group_name, group_vars, group_text, group_end in matches:
+            group_texts = ""
+            for var in group_vars.split(";"):
+                self.cus_vars[group_name] = var
+                group_texts += self.parse_cus_var(group_text)
+            xml_str = xml_str.replace(group_for, group_texts)
+        return xml_str
+
     def preprocess(self):
         self.processed_file["content"] = []
         for index, xml_str in enumerate(self.original_file["content"]):
@@ -114,7 +125,7 @@ class Preprocessor():
             xml_str = self.parse_if_elseif(xml_str)
             xml_str = self.parse_ifdef_ifndef(xml_str)
             xml_str = self.parse_error_warning(xml_str)
-            #TODO: Iteration Statements <?foreach?>
+            xml_str = self.parse_foreach(xml_str)
             self.processed_file["content"].extend(xml_str.split("\n"))
 
     def save(self, file_path):
