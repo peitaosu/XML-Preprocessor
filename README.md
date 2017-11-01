@@ -49,4 +49,15 @@ $(var.CustomVariable)
 <?warning "This is warning message!" ?>
 ```
 
+## Usage
+
+### python
+```
+from preprocessor import *
+
+proc = Preprocessor()
+proc.load("input.xml")
+proc.preprocess()
+proc.save("output.xml")
+```
 
