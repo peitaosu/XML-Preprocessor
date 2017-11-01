@@ -14,7 +14,7 @@ class Preprocessor():
         self.original_file["file"] = file_path
         try:
             with open(file_path, "r") as original_file:
-                self.original_file["content"] = original_file.read().split("\n")
+                self.original_file["content"] = original_file.read()
             return 0
         except:
             return -1
@@ -144,25 +144,50 @@ class Preprocessor():
             xml_str = xml_str.replace(group_full, result)
         return xml_str
 
+    def format_xml_str(self, xml_str):
+        right_blank_regex = r"(>[\n\s\t\r]*)"
+        left_blank_regex = r"([\n\s\t\r]*<)"
+        matches = re.findall(right_blank_regex, xml_str)
+        for group_full in matches:
+            xml_str = xml_str.replace(group_full, ">")
+        matches = re.findall(left_blank_regex, xml_str)
+        for group_full in matches:
+            xml_str = xml_str.replace(group_full, "<")
+        xml_str.replace("\n", "")
+        return xml_str
+
+    def need_parse(self, xml_str):
+        for keyword in ["<?include", "$(env", "$(var", "$(sys", "<?if", "<?else", "<?end", "<?for", "<?err", "<?war"]:
+            if keyword in xml_str:
+                return True
+        return False
+
     def preprocess(self):
-        self.processed_file["content"] = []
-        for index, xml_str in enumerate(self.original_file["content"]):
-            xml_str = self.parse_include(xml_str)
-            xml_str = self.parse_env_var(xml_str)
-            xml_str = self.parse_sys_var(xml_str)
-            xml_str = self.parse_cus_var(xml_str)
-            xml_str = self.parse_if_elseif(xml_str)
-            xml_str = self.parse_ifdef_ifndef(xml_str)
-            xml_str = self.parse_error_warning(xml_str)
-            xml_str = self.parse_foreach(xml_str)
-            xml_str = self.parse_if_else_if(xml_str)
-            self.processed_file["content"].extend(xml_str.split("\n"))
+        self.processed_file["content"] = ""
+        proc_functions = [
+            self.format_xml_str,
+            self.parse_include,
+            self.parse_env_var,
+            self.parse_sys_var,
+            self.parse_cus_var,
+            self.parse_if_elseif,
+            self.parse_ifdef_ifndef,
+            self.parse_error_warning,
+            self.parse_foreach,
+            self.parse_if_else_if,
+            self.format_xml_str
+        ]
+        xml_str = self.original_file["content"]
+        while(self.need_parse(xml_str)):
+            for i in range(11):
+                xml_str = proc_functions[i](xml_str)
+        self.processed_file["content"] = xml_str
 
     def save(self, file_path):
         self.processed_file["file"] = file_path
         try:
             with open(file_path, "w") as processed_file:
-                processed_file.write("\n".join(self.processed_file["content"]))
+                processed_file.write(self.processed_file["content"])
             return 0
         except:
             return -1
