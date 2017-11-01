@@ -59,5 +59,8 @@ proc = Preprocessor()
 proc.load("input.xml")
 proc.preprocess()
 proc.save("output.xml")
+
+# command line
+> python preprocessor.py <input.xml> [output.xml]
 ```
 
