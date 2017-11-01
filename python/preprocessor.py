@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import re
 from lxml import etree
@@ -193,3 +194,20 @@ class Preprocessor():
             return 0
         except:
             return -1
+
+if __name__ == "__main__":
+    proc = Preprocessor()
+    if len(sys.argv) < 2:
+        print """
+    Usage:
+        > python preprocessor.py <input.xml> [output.xml]
+"""
+        sys.exit(-1)
+    input = sys.argv[1]
+    if len(sys.argv) == 2:
+        output = "output.xml"
+    else:
+        output = sys.argv[2]
+    proc.load(input)
+    proc.preprocess()
+    proc.save(output)
