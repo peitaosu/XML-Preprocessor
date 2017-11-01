@@ -1,7 +1,7 @@
 import os
 import platform
 import re
-
+from lxml import etree
 
 class Preprocessor():
     def __init__(self):
@@ -185,9 +185,11 @@ class Preprocessor():
 
     def save(self, file_path):
         self.processed_file["file"] = file_path
+        xml_str = self.processed_file["content"]
+        root = etree.fromstring(xml_str)
         try:
             with open(file_path, "w") as processed_file:
-                processed_file.write(self.processed_file["content"])
+                processed_file.write(etree.tostring(root, pretty_print=True))
             return 0
         except:
             return -1
