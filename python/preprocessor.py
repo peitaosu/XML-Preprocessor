@@ -166,7 +166,6 @@ class Preprocessor():
     def preprocess(self):
         self.processed_file["content"] = ""
         proc_functions = [
-            self.format_xml_str,
             self.parse_include,
             self.parse_env_var,
             self.parse_sys_var,
@@ -179,8 +178,9 @@ class Preprocessor():
             self.format_xml_str
         ]
         xml_str = self.original_file["content"]
+        xml_str = self.format_xml_str(xml_str)
         while(self.need_parse(xml_str)):
-            for i in range(11):
+            for i in range(10):
                 xml_str = proc_functions[i](xml_str)
         self.processed_file["content"] = xml_str
 
@@ -190,6 +190,7 @@ class Preprocessor():
         root = etree.fromstring(xml_str)
         try:
             with open(file_path, "w") as processed_file:
+                processed_file.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
                 processed_file.write(etree.tostring(root, pretty_print=True))
             return 0
         except:
