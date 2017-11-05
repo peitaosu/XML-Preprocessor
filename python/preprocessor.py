@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import re
+import subprocess
 from lxml import etree
 
 class Preprocessor():
@@ -145,6 +146,18 @@ class Preprocessor():
             xml_str = xml_str.replace(group_full, result)
         return xml_str
 
+    def parse_command(self, xml_str):
+        cmd_regex = r"(<\?cmd\s*\"([^\"]+)\"\s*\?>)"
+        matches = re.findall(cmd_regex, xml_str)
+        for group_cmd, group_exec in matches:
+            try:
+                output = subprocess.check_output(group_exec, shell=True, stderr=subprocess.STDOUT)
+                print output
+                xml_str = xml_str.replace(group_cmd, "")
+            except subprocess.CalledProcessError as e:
+                raise Exception(e.output)
+        return xml_str
+
     def format_xml_str(self, xml_str):
         right_blank_regex = r"(>[\n\s\t\r]*)"
         left_blank_regex = r"([\n\s\t\r]*<)"
@@ -158,7 +171,7 @@ class Preprocessor():
         return xml_str
 
     def need_parse(self, xml_str):
-        for keyword in ["<?include", "$(env", "$(var", "$(sys", "<?if", "<?else", "<?end", "<?for", "<?err", "<?war"]:
+        for keyword in ["<?include", "$(env", "$(var", "$(sys", "<?if", "<?else", "<?end", "<?for", "<?err", "<?war", "<?cmd"]:
             if keyword in xml_str:
                 return True
         return False
@@ -175,12 +188,13 @@ class Preprocessor():
             self.parse_error_warning,
             self.parse_foreach,
             self.parse_if_else_if,
+            self.parse_command,
             self.format_xml_str
         ]
         xml_str = self.original_file["content"]
         xml_str = self.format_xml_str(xml_str)
         while(self.need_parse(xml_str)):
-            for i in range(10):
+            for i in range(len(proc_functions)):
                 xml_str = proc_functions[i](xml_str)
         self.processed_file["content"] = xml_str
 
