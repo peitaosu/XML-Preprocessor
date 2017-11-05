@@ -4,7 +4,7 @@
 
 ## What is XML Preprocessor ?
 
-This is a XML Preprocessor which can be used to process your XML file before you use it, to process conditional statements, variables, iteration statements, etc.
+This is a XML Preprocessor which can be used to process your XML file before you use it, to process conditional statements, variables, iteration statements, error/warning, execute command, etc.
 
 ## XML Schema
 
@@ -49,6 +49,11 @@ $(var.CustomVariable)
 <?error "This is error message!" ?>
 
 <?warning "This is warning message!" ?>
+```
+
+### Commands
+```
+<? cmd "echo hello world" ?>
 ```
 
 ## Usage
