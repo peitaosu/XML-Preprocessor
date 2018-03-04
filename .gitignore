@@ -1,5 +1,12 @@
 # Visual Studio Code Configuration Files
+.vs/
+
+# Visual Studio Code Configuration Files
 .vscode/
 
 # Python
 *.pyc
+
+# Binaries
+bin/
+obj/
