@@ -71,3 +71,14 @@ proc.save("output.xml")
 > python preprocessor.py <input.xml> [output.xml]
 ```
 
+### C#
+```
+Preprocessor preprocessor = new Preprocessor();
+XmlDocument processedXmlDoc = new XmlDocument();
+processedXmlDoc = preprocessor.Process(inXml, null);
+processedXmlDoc.Save(outXml);
+
+# command line
+> XMLPreprocessor.exe in.xml [out.xml]
+```
+
