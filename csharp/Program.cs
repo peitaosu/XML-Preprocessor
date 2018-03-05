@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,16 +31,29 @@ namespace XMLPreprocessor
             
             Preprocessor preprocessor = new Preprocessor();
             XmlDocument processedXmlDoc = new XmlDocument();
-            processedXmlDoc = preprocessor.Process(inXml, null);
-            if(outXml == "")
+            try
             {
-                processedXmlDoc.Save(inXml);
+                processedXmlDoc = preprocessor.Process(inXml, null);
+                if (outXml == "")
+                {
+                    processedXmlDoc.Save(inXml);
+                }
+                else
+                {
+                    processedXmlDoc.Save(outXml);
+                }
+                return 0;
             }
-            else
+            catch (FileNotFoundException e)
             {
-                processedXmlDoc.Save(outXml);
+                Console.WriteLine(e.Message);
+                return -1;
             }
-            return 0;
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e.Message);
+                return -1;
+            }
         }
     }
 }
