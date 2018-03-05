@@ -79,6 +79,6 @@ processedXmlDoc = preprocessor.Process(inXml, null);
 processedXmlDoc.Save(outXml);
 
 # command line
-> XMLPreprocessor.exe in.xml [out.xml]
+> XMLPreprocessor.exe <input.xml> [output.xml]
 ```
 

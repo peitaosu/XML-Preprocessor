@@ -24,7 +24,7 @@ namespace XMLPreprocessor
             }
             else
             {
-                Console.WriteLine("XMLPreprocessor.exe in.xml [out.xml]");
+                Console.WriteLine("XMLPreprocessor.exe <input.xml> [output.xml]");
                 return -1;
             }
             
