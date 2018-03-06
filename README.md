@@ -73,6 +73,7 @@ proc.save("output.xml")
 
 ### C#
 ```
+# add Preprocessor.cs, PreprocessorCore.cs, PreprocessorExtension.cs, ProcessedStreamEventHandler.cs, IfContext.cs, IfDefEventHandler.cs and IncludedFileEventHandler.cs into your project then
 Preprocessor preprocessor = new Preprocessor();
 XmlDocument processedXmlDoc = new XmlDocument();
 processedXmlDoc = preprocessor.Process(inXml, null);
