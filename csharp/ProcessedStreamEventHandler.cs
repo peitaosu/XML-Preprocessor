@@ -1,3 +1,7 @@
+/* 
+    Preprocessor implementation is from https://github.com/wixtoolset 
+*/
+
 using System;
 using System.IO;
 
