@@ -176,15 +176,6 @@ namespace XMLPreprocessor
 
             switch (prefix)
             {
-                case "wix":
-                    switch (pragma)
-                    {
-                        // Add any core defined pragmas here
-                        default:
-                            Console.WriteLine("[Warning] Preprocessor Unknown Pragma: " + pragmaName);
-                            break;
-                    }
-                    break;
                 default:
                     PreprocessorExtension extension = (PreprocessorExtension)this.extensionsByPrefix[prefix];
                     if (null == extension || !extension.ProcessPragma( prefix, pragma, args, writer))
